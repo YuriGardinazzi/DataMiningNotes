@@ -46,8 +46,10 @@ def pca(df):
     
     T = np.dot(U,S) #Scores 
     P = V   #Loadings
-    E = np.subtract(X,T) #Residuals 
-    
+    data = pd.DataFrame(data=np.dot(T,P.T), columns=df.columns[1:])
+    E = X.subtract(data) #Residuals 
+    E = E.abs()
+
     Eigen_pca = np.power(S,2)/(n-1)
     return T,P,E, Eigen_pca
  
@@ -78,8 +80,12 @@ Plot dei residui
 '''
 def plot_residuals(E):
     columns_name =  E.columns
-    print(columns_name)
-    sns.scatterplot(x=len(E[columns_name[1]]), y=E[columns_name[1]])
+    
+    ax = plt.subplot()
+    for col in columns_name:
+        sns.scatterplot(x=range(len(E[col])), y=E[col])
+        
+    ax.set(title=f"residuals of {columns_name[1]}")
     plt.show()
     plt.close()
 
