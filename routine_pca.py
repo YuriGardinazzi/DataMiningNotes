@@ -47,8 +47,11 @@ def pca(df):
     T = np.dot(U,S) #Scores 
     P = V   #Loadings
     data = pd.DataFrame(data=np.dot(T,P.T), columns=df.columns[1:])
+    #data = pd.DataFrame(data=np.dot(T,P.T), columns=list(range(n-1)))
+    #data = pd.DataFrame(data=np.dot(T,P.T), columns=(list(range(n))))
     E = X.subtract(data) #Residuals 
-    E = E.abs()
+    #E = E*E
+    
 
     Eigen_pca = np.power(S,2)/(n-1)
     return T,P,E, Eigen_pca
@@ -64,7 +67,8 @@ per (0,0)
 def plot_pca(scores,component_1=1, component_2=2, show_zero_axes = True):
     pc1 = component_1 - 1
     pc2 = component_2 - 1
-    
+   
+    plt.figure(2)
     ax = plt.subplot()
     if show_zero_axes:  
         ax.axhline(y=0, color='k', linewidth=1)
@@ -79,13 +83,16 @@ def plot_pca(scores,component_1=1, component_2=2, show_zero_axes = True):
 Plot dei residui
 '''
 def plot_residuals(E):
+    plt.figure(1)
     columns_name =  E.columns
     
     ax = plt.subplot()
-    for col in columns_name:
-        sns.scatterplot(x=range(len(E[col])), y=E[col])
-        
-    ax.set(title=f"residuals of {columns_name[1]}")
+    #for col in columns_name:
+    #    sns.scatterplot(x=range(len(E[col])), y=E[col])
+    sns.scatterplot(x=range(len(E[columns_name[0]])), y=E[columns_name[0]])
+    #sns.scatterplot(x=range(len(E['linoleico'])), y=E['linoleico'])
+    #sns.lineplot(x=range(len(E['linoleico'])), y=E['linoleico'])
+    ax.set(title=f"residuals")
     plt.show()
     plt.close()
 
@@ -102,3 +109,4 @@ if __name__ == '__main__':
     
     plot_pca(scores)
     plot_residuals(residuals)
+    #plt.show()
