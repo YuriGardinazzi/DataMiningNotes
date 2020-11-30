@@ -17,13 +17,11 @@ Restituisce il DataFrame ripulito dato un file excel in input
 '''
 def get_df(filename):
     input_df = df=pd.read_excel(filename)
-    
+
     #sostituisco il nome della colonna delle variabili contente il tipo con "Class"
     df.rename(columns={'Unnamed: 0':'Class'}, inplace=True )
-   
     #rimuovo eventuali spazi nei nomi
     df.rename(columns=lambda x: x.strip(), inplace=True)
-
     return input_df
 '''
 Stampa a terminale le prime 5 righe del DataFrame
@@ -35,9 +33,10 @@ def show_first_rows(df):
 Effettua la PCA sul dataframe utilizzando SVD
 '''
 def pca(df):
-    X = df
-    X = df.drop('Class', axis=1)
-        
+
+    
+    #Assegno ad X solo le colonne coi dati numerici
+    X=  df.loc[:, df.columns != 'Class']   
     n = X.shape[0]
     #applicazione del metodo SVD
     U,s,Vt = np.linalg.svd(X,full_matrices=False,compute_uv=True)
@@ -64,25 +63,41 @@ component_1 e component_2 indicano le due componenti che si vogliono plottare
 show_zero_axes è True di default e permette di plottare gli assi X e Y passanti
 per (0,0)
 '''   
-def plot_pca(scores,component_1=1, component_2=2, show_zero_axes = True):
+def plot_pca(scores,dataf,component_1=1, component_2=2, show_zero_axes = True):
     pc1 = component_1 - 1
     pc2 = component_2 - 1
-   
+    pc1string = f"PC{component_1}"
+    pc2string = f"PC{component_2}"
+    class_column = dataf['Class']
+    
+   # print(class_column)
+    pc1df = pd.DataFrame(scores[:,pc1])
+    pc1df.columns = [f"PC{component_1}"]
+    
+    pc2df = pd.DataFrame(scores[:,pc2])
+    pc2df.columns = [f"PC{component_2}"]
+    
+    
+    outputdf =pd.concat([class_column,pc1df,pc2df], axis = 1)
+    
+    
     plt.figure(2)
     ax = plt.subplot()
     if show_zero_axes:  
         ax.axhline(y=0, color='k', linewidth=1)
         ax.axvline(x=0, color='k', linewidth=1)
-    ax.set(xlabel=f"PC{component_1}", ylabel=f"PC{component_2}",)
-   
-    sns.scatterplot(x=scores[:,pc1], y=scores[:,pc2])
+
+
+    for key,group in outputdf.groupby('Class'):
+         sns.scatterplot(x=group[pc1string], y=group[pc2string],label=key)
+
     plt.show()
     plt.close()
     return
 '''
 Plot dei residui
 '''
-def plot_residuals(E):
+def plot_residuals(E, eigen_val, T):
     plt.figure(1)
     columns_name =  E.columns
     
@@ -96,6 +111,19 @@ def plot_residuals(E):
     plt.show()
     plt.close()
 
+'''
+Applicazione del preprocessing
+'''
+def custom_preprocessing(df):
+    #prendo un dataframe con solo i dati numerici
+    df_num = df.select_dtypes(include=[np.number])
+    
+    #applico il preprocessing
+    df_result= (df_num - df_num.mean())/df_num.std() 
+    
+    #assegno le colonne preprocessate al dataframe originale
+    df[df_result.columns] = df_result
+    return df
 if __name__ == '__main__':
     print("ROUTINE PCA\n \
           Inserisci il nome del file Excel da leggere: ")
@@ -103,10 +131,9 @@ if __name__ == '__main__':
     #filename = input("file: ")
     df = get_df(filename)
     #show_first_rows(df)
+    df = custom_preprocessing(df)
 
-    df = (df - df.mean())/df.std()  #Little Preprocessing
     scores, loadings, residuals, eigen_pca = pca(df)
-    
-    plot_pca(scores)
-    plot_residuals(residuals)
+    plot_pca(scores,dataf = df)
+    #plot_residuals(residuals)
     #plt.show()
