@@ -8,10 +8,10 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import datasets
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, AgglomerativeClustering
 import plotly.express as px
 import seaborn as sns
-from scipy.cluster.hierarchy import dendrogram, linkage
+from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
 from scipy.spatial.distance import pdist
 
 '''
@@ -146,13 +146,23 @@ def clustering(df):
     X=  df.loc[:, df.columns != 'Class']   
     mat = X.values
     # Using sklearn
-    km = KMeans(n_clusters=10)
-    km.fit(mat)
+    agm = AgglomerativeClustering(n_clusters=None,linkage='complete', affinity='euclidean',distance_threshold=5.7)
+    agm.fit(mat)
     # Get cluster assignment labels
-    labels = km.labels_
+    labels = agm.labels_
 
-    centroids = km.cluster_centers_
+    # centroids = km.cluster_centers_
     
+    
+   # Z = linkage(X, method='complete', metric='euclidean')
+    # fig = plt.figure(figsize=(30, 30))
+    # dendrogram(Z, labels=df['Class'].to_numpy())
+    #dendrogram(Z)
+    # plt.show()
+    
+    #labels = fcluster(Z, t=8)
+   # print(Z)
+    #print(labels)
     #Eseguo la PCA 
     scores, loadings, residuals, eigen_pca = pca(df)
     
@@ -170,7 +180,7 @@ def clustering(df):
 #    clustering_labels.columns['Clusters']
 
     outputdf = pd.concat([clustering_labels,pc1df,pc2df],axis=1)
-    
+    print(outputdf.head())
     for key,group in outputdf.groupby('Clusters'):
         sns.scatterplot(x=group['PC1'], y=group['PC2'],label=key)
 
@@ -193,6 +203,8 @@ def plot_dendogram(df):
     #dendrogram(Z)
     plt.show()
     
+    clusters = fcluster(Z, 4)
+    
     Zcolumns = linkage(X.T, method='complete', metric='euclidean')
     fig = plt.figure(figsize=(30, 30))
     dendrogram(Zcolumns, labels=column_labels)
@@ -209,8 +221,12 @@ def plot_full_dendogram(df):
     X=  df.loc[:, df.columns != 'Class']
     ax = sns.clustermap(X, method='complete', metric='cityblock')
     ax.fig.suptitle('Complete - manhattan')
+    
     ax = sns.clustermap(X, method='complete', metric='euclidean')
     ax.fig.suptitle('Complete - Euclidean')
+
+
+
 if __name__ == '__main__':
     print("ROUTINE PCA\n \
           Inserisci il nome del file Excel da leggere: ")
