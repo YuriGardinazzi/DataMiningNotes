@@ -195,7 +195,7 @@ def plot_dendogram(df):
     
     Zcolumns = linkage(X.T, method='complete', metric='euclidean')
     fig = plt.figure(figsize=(30, 30))
-    dendrogram(Z, labels=column_labels)
+    dendrogram(Zcolumns, labels=column_labels)
     #dendrogram(Z)
     
     
@@ -203,12 +203,14 @@ def plot_dendogram(df):
     plt.show()
 
 '''
-Plot dendogram for samples and variables over the matrix of sample
+Plot dendogram for samples and variables on the sides of variables map
 '''
 def plot_full_dendogram(df):
     X=  df.loc[:, df.columns != 'Class']
-    sns.clustermap(X, method='complete', metric='cityblock')
-    sns.clustermap(X, method='complete', metric='euclidean')
+    ax = sns.clustermap(X, method='complete', metric='cityblock')
+    ax.set_title('Complete - manhattan')
+    ax = sns.clustermap(X, method='complete', metric='euclidean')
+    ax.set_title('Complete - Euclidean')
 if __name__ == '__main__':
     print("ROUTINE PCA\n \
           Inserisci il nome del file Excel da leggere: ")
