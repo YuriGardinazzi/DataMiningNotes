@@ -107,7 +107,7 @@ def plot_residuals(E, eigen_val, T):
     sns.scatterplot(x=range(len(E[columns_name[0]])), y=E[columns_name[0]])
     #sns.scatterplot(x=range(len(E['linoleico'])), y=E['linoleico'])
     #sns.lineplot(x=range(len(E['linoleico'])), y=E['linoleico'])
-    ax.set(title=f"residuals")
+    ax.set(title="residuals")
     plt.show()
     plt.close()
 
