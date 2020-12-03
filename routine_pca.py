@@ -124,6 +124,22 @@ def custom_preprocessing(df):
     #assegno le colonne preprocessate al dataframe originale
     df[df_result.columns] = df_result
     return df
+
+'''
+Plot data matrix without "Class" variable
+'''
+def plot_matrix(df):
+    df_matrix = df.loc[:, df.columns != 'Class'] 
+    fig, ax = plt.subplots(figsize=(10,10))
+    ax.matshow(df_matrix, interpolation='nearest',\
+                     aspect='auto',cmap='jet')
+        
+    plt.xticks(range(len(df_matrix.columns)), df_matrix.columns, \
+                fontsize=14, rotation=90)
+    ax.xaxis.set_ticks_position('bottom')
+    plt.show()
+
+plt.show()
 if __name__ == '__main__':
     print("ROUTINE PCA\n \
           Inserisci il nome del file Excel da leggere: ")
@@ -135,5 +151,6 @@ if __name__ == '__main__':
 
     scores, loadings, residuals, eigen_pca = pca(df)
     plot_pca(scores,dataf = df)
+    plot_matrix(df)
     #plot_residuals(residuals)
     #plt.show()
