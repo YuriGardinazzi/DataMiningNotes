@@ -11,7 +11,8 @@ from sklearn import datasets
 from sklearn.cluster import KMeans
 import plotly.express as px
 import seaborn as sns
-
+from scipy.cluster.hierarchy import dendrogram, linkage
+from scipy.spatial.distance import pdist
 
 '''
 Restituisce il DataFrame ripulito dato un file excel in input
@@ -167,13 +168,47 @@ def clustering(df):
     
 
 #    clustering_labels.columns['Clusters']
-    print(clustering_labels.head())
+
     outputdf = pd.concat([clustering_labels,pc1df,pc2df],axis=1)
     
     for key,group in outputdf.groupby('Clusters'):
         sns.scatterplot(x=group['PC1'], y=group['PC2'],label=key)
 
     plt.show()
+    
+
+    #df_labels  = df['Class']
+    
+
+def plot_dendogram(df):
+    X=  df.loc[:, df.columns != 'Class']   
+    column_labels = X.columns
+    #cityblock = manhattan 
+    #https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html#scipy.spatial.distance.pdist
+    #Z = linkage(X, method='average', metric='cityblock')
+    #Z = linkage(X, method='single', metric='euclidean')
+    Z = linkage(X, method='complete', metric='euclidean')
+    fig = plt.figure(figsize=(30, 30))
+    dendrogram(Z, labels=df['Class'].to_numpy())
+    #dendrogram(Z)
+    plt.show()
+    
+    Zcolumns = linkage(X.T, method='complete', metric='euclidean')
+    fig = plt.figure(figsize=(30, 30))
+    dendrogram(Z, labels=column_labels)
+    #dendrogram(Z)
+    
+    
+    
+    plt.show()
+
+'''
+Plot dendogram for samples and variables over the matrix of sample
+'''
+def plot_full_dendogram(df):
+    X=  df.loc[:, df.columns != 'Class']
+    sns.clustermap(X, method='complete', metric='cityblock')
+    sns.clustermap(X, method='complete', metric='euclidean')
 if __name__ == '__main__':
     print("ROUTINE PCA\n \
           Inserisci il nome del file Excel da leggere: ")
@@ -188,5 +223,7 @@ if __name__ == '__main__':
     plot_matrix(df)
     
     clustering(df)
+    plot_dendogram(df)
+    plot_full_dendogram(df)
     #plot_residuals(residuals)
     #plt.show()
