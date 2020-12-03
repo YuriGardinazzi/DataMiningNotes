@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import datasets
+from sklearn.cluster import KMeans
 import plotly.express as px
 import seaborn as sns
 
@@ -70,7 +71,6 @@ def plot_pca(scores,dataf,component_1=1, component_2=2, show_zero_axes = True):
     pc2string = f"PC{component_2}"
     class_column = dataf['Class']
     
-   # print(class_column)
     pc1df = pd.DataFrame(scores[:,pc1])
     pc1df.columns = [f"PC{component_1}"]
     
@@ -138,8 +138,42 @@ def plot_matrix(df):
                 fontsize=14, rotation=90)
     ax.xaxis.set_ticks_position('bottom')
     plt.show()
+'''
+Clustering and Plot
+'''
+def clustering(df):
+    X=  df.loc[:, df.columns != 'Class']   
+    mat = X.values
+    # Using sklearn
+    km = KMeans(n_clusters=10)
+    km.fit(mat)
+    # Get cluster assignment labels
+    labels = km.labels_
 
-plt.show()
+    centroids = km.cluster_centers_
+    
+    #Eseguo la PCA 
+    scores, loadings, residuals, eigen_pca = pca(df)
+    
+    
+    pc1df = pd.DataFrame(scores[:,0])
+    pc1df.columns = ['PC1']
+    pc2df = pd.DataFrame(scores[:,1])
+    pc2df.columns = ['PC2']
+    
+
+    
+    clustering_labels = pd.DataFrame(data =labels, columns=['Clusters'])
+    
+
+#    clustering_labels.columns['Clusters']
+    print(clustering_labels.head())
+    outputdf = pd.concat([clustering_labels,pc1df,pc2df],axis=1)
+    
+    for key,group in outputdf.groupby('Clusters'):
+        sns.scatterplot(x=group['PC1'], y=group['PC2'],label=key)
+
+    plt.show()
 if __name__ == '__main__':
     print("ROUTINE PCA\n \
           Inserisci il nome del file Excel da leggere: ")
@@ -152,5 +186,7 @@ if __name__ == '__main__':
     scores, loadings, residuals, eigen_pca = pca(df)
     plot_pca(scores,dataf = df)
     plot_matrix(df)
+    
+    clustering(df)
     #plot_residuals(residuals)
     #plt.show()
