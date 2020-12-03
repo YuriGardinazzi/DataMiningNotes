@@ -146,7 +146,7 @@ def clustering(df):
     X=  df.loc[:, df.columns != 'Class']   
     mat = X.values
     # Using sklearn
-    agm = AgglomerativeClustering(n_clusters=None,linkage='ward', affinity='euclidean',distance_threshold=13)
+    agm = AgglomerativeClustering(n_clusters=None,linkage='single', affinity='euclidean',distance_threshold=13)
     agm.fit(mat)
     # Get cluster assignment labels
     labels = agm.labels_
@@ -200,7 +200,7 @@ def plot_dendogram(df):
     #https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html#scipy.spatial.distance.pdist
     #Z = linkage(X, method='average', metric='cityblock')
     #Z = linkage(X, method='single', metric='euclidean')
-    Z = linkage(X, method='ward', metric='euclidean')
+    Z = linkage(X, method='single', metric='euclidean')
     fig = plt.figure(figsize=(30, 30))
     dendrogram(Z, labels=df['Class'].to_numpy())
     #dendrogram(Z)
@@ -208,7 +208,7 @@ def plot_dendogram(df):
     
     clusters = fcluster(Z, 4)
     
-    Zcolumns = linkage(X.T, method='ward', metric='euclidean')
+    Zcolumns = linkage(X.T, method='single', metric='euclidean')
     fig = plt.figure(figsize=(30, 30))
     dendrogram(Zcolumns, labels=column_labels)
     #dendrogram(Z)
@@ -221,12 +221,18 @@ def plot_dendogram(df):
 Plot dendogram for samples and variables on the sides of variables map
 '''
 def plot_full_dendogram(df):
-    X=  df.loc[:, df.columns != 'Class']
-    ax = sns.clustermap(X, method='ward', metric='euclidean')
-    ax.fig.suptitle('Complete - manhattan')
+    method1 = 'complete'
+    metric1 = 'euclidean'
     
-    ax = sns.clustermap(X, method='ward', metric='euclidean')
-    ax.fig.suptitle('Complete - Euclidean')
+    method2 = 'complete'
+    metric2 = 'cityblock'
+    
+    X=  df.loc[:, df.columns != 'Class']
+    ax = sns.clustermap(X, method=method1, metric=metric1)
+    ax.fig.suptitle(f'{method1} - {metric1}')
+    
+    ax = sns.clustermap(X, method=method2, metric=metric2)
+    ax.fig.suptitle(f"{method2} - {metric2}")
 
 
 
