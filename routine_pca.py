@@ -208,9 +208,9 @@ Plot dendogram for samples and variables on the sides of variables map
 def plot_full_dendogram(df):
     X=  df.loc[:, df.columns != 'Class']
     ax = sns.clustermap(X, method='complete', metric='cityblock')
-    ax.set_title('Complete - manhattan')
+    ax.fig.suptitle('Complete - manhattan')
     ax = sns.clustermap(X, method='complete', metric='euclidean')
-    ax.set_title('Complete - Euclidean')
+    ax.fig.suptitle('Complete - Euclidean')
 if __name__ == '__main__':
     print("ROUTINE PCA\n \
           Inserisci il nome del file Excel da leggere: ")
