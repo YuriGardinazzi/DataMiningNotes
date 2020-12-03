@@ -222,10 +222,10 @@ Plot dendogram for samples and variables on the sides of variables map
 '''
 def plot_full_dendogram(df):
     X=  df.loc[:, df.columns != 'Class']
-    ax = sns.clustermap(X, method='complete', metric='cityblock')
+    ax = sns.clustermap(X, method='ward', metric='cityblock')
     ax.fig.suptitle('Complete - manhattan')
     
-    ax = sns.clustermap(X, method='complete', metric='euclidean')
+    ax = sns.clustermap(X, method='ward', metric='euclidean')
     ax.fig.suptitle('Complete - Euclidean')
 
 
