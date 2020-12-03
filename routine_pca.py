@@ -84,9 +84,9 @@ def plot_pca(scores,dataf,component_1=1, component_2=2, show_zero_axes = True):
     
     plt.figure(2)
     ax = plt.subplot()
-    if show_zero_axes:  
-        ax.axhline(y=0, color='k', linewidth=1)
-        ax.axvline(x=0, color='k', linewidth=1)
+    #if show_zero_axes:  
+    ax.axhline(y=0, color='k', linewidth=1)
+    ax.axvline(x=0, color='k', linewidth=1)
 
 
     for key,group in outputdf.groupby('Class'):
@@ -146,7 +146,7 @@ def clustering(df):
     X=  df.loc[:, df.columns != 'Class']   
     mat = X.values
     # Using sklearn
-    agm = AgglomerativeClustering(n_clusters=None,linkage='complete', affinity='euclidean',distance_threshold=5.7)
+    agm = AgglomerativeClustering(n_clusters=None,linkage='ward', affinity='euclidean',distance_threshold=13)
     agm.fit(mat)
     # Get cluster assignment labels
     labels = agm.labels_
@@ -172,8 +172,11 @@ def clustering(df):
     pc2df = pd.DataFrame(scores[:,1])
     pc2df.columns = ['PC2']
     
-
-    
+    ax = plt.subplot()
+    #if show_zero_axes:  
+    ax.axhline(y=0, color='k', linewidth=1)
+    ax.axvline(x=0, color='k', linewidth=1)
+        
     clustering_labels = pd.DataFrame(data =labels, columns=['Clusters'])
     
 
@@ -197,7 +200,7 @@ def plot_dendogram(df):
     #https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html#scipy.spatial.distance.pdist
     #Z = linkage(X, method='average', metric='cityblock')
     #Z = linkage(X, method='single', metric='euclidean')
-    Z = linkage(X, method='complete', metric='euclidean')
+    Z = linkage(X, method='ward', metric='euclidean')
     fig = plt.figure(figsize=(30, 30))
     dendrogram(Z, labels=df['Class'].to_numpy())
     #dendrogram(Z)
@@ -205,7 +208,7 @@ def plot_dendogram(df):
     
     clusters = fcluster(Z, 4)
     
-    Zcolumns = linkage(X.T, method='complete', metric='euclidean')
+    Zcolumns = linkage(X.T, method='ward', metric='euclidean')
     fig = plt.figure(figsize=(30, 30))
     dendrogram(Zcolumns, labels=column_labels)
     #dendrogram(Z)
